@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brighthouse Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .tab-container { display: flex; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; cursor: pointer; background-color: #f0f0f0; }
+        .tab.active { background-color: #ddd; }
+        .content { display: none; }
+        .content.active { display: block; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
+    </style>
+</head>
+<body>
+
+<div class="tab-container">
+    <div class="tab active" onclick="showTab('bidTool')">BID TOOL</div>
+    <div class="tab" onclick="showTab('inputs')">INPUTS</div>
+    <div class="tab" onclick="showTab('formulas')">Formulas</div>
+</div>
+
+<div id="bidTool" class="content active">
+    <h2>BID TOOL</h2>
+    <table>
+        <tbody id="bidToolTableBody"></tbody>
+    </table>
+</div>
+
+<div id="inputs" class="content">
+    <h2>INPUTS</h2>
+    <table>
+        <tbody id="inputsTableBody"></tbody>
+    </table>
+</div>
+
+<div id="formulas" class="content">
+    <h2>Formulas</h2>
+    <table>
+        <tbody id="formulasTableBody"></tbody>
+    </table>
+</div>
+
+<script>
+    function showTab(tabId) {
+        document.querySelectorAll('.content').forEach(content => content.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    function populateTable(data, tableBodyId) {
+        const tableBody = document.getElementById(tableBodyId);
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            row.forEach(cell => {
+                const td = document.createElement('td');
+                td.textContent = cell;
+                tr.appendChild(td);
+            });
+            tableBody.appendChild(tr);
+        });
+    }
+
+    async function loadData() {
+        const [bidToolData, inputsData, formulasData] = await Promise.all([
+            fetch('bid_tool.json').then(res => res.json()),
+            fetch('inputs.json').then(res => res.json()),
+            fetch('formulas.json').then(res => res.json())
+        ]);
+
+        populateTable(bidToolData, 'bidToolTableBody');
+        populateTable(inputsData, 'inputsTableBody');
+        populateTable(formulasData, 'formulasTableBody');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadData);
+</script>
+
+</body>
+</html>
